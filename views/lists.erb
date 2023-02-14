@@ -1,3 +1,9 @@
+<% if session[:message] %>
+  <div class='flash success'>
+    <p><%= session.delete(:message) %></p>
+  </div>
+<% end %>
+
 <ul id='lists'>
   <% @lists.each do |list| %>
     <li>
