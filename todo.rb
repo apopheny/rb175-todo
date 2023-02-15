@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require 'sinatra/reloader'
+require 'sinatra/content_for'
 require 'tilt/erubis'
 require 'pry'
 
@@ -23,6 +24,7 @@ helpers do
     end
     return { valid: false, error: MESSAGES[:list_duplicate_name] }\
       if session[:lists].any? { |list| list[:name] == name }
+
     { valid: true }
   end
 end
@@ -31,7 +33,8 @@ end
 MESSAGES = {
   new_list_success: 'The list has been created.',
   list_length_error: 'List name must be between 1-100 characters.',
-  list_duplicate_name: 'List name already exists. Please choose a unique name.'
+  list_duplicate_name: 'List name already exists. Please choose a unique name.',
+  list_edit_success: 'The list name has been changed.'
 }.freeze
 
 get '/' do
@@ -60,5 +63,30 @@ post '/lists/new' do
   else
     session[:error] = name_status[:error]
     erb :new_list, layout: :layout
+  end
+end
+
+# View list
+get '/lists/:id' do
+  @list = session[:lists][params[:id].to_i]
+  erb :list, layout: :layout
+end
+
+# Render page to edit list name
+get '/lists/:id/edit' do
+  erb :list_edit, layout: :layout
+end
+
+# Submit list name changes with validation
+post '/lists/:id/edit' do
+  list_name = params[:list_name].strip || ''
+  name_status = valid_list?(list_name)
+  if name_status[:valid]
+    session[:lists][params[:id]][:name] = list_name
+    session[:success] = MESSAGES[:list_edit_success]
+    redirect '/lists'
+  else
+    session[:error] = name_status[:error]
+    erb :list_edit, layout: :layout
   end
 end
