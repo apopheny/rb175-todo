@@ -4,10 +4,6 @@
       <a href="/lists/<%= idx %>">
         <h2><%= list[:name] %></h2>
       </a> 
-      <p>
-        <a href='/lists/<%= idx %>/edit'>Edit List</a>
-        <%= list[:todos].size %>
-      </p>
     </li>
   <% end %>
 </ul>

@@ -79,10 +79,11 @@ end
 
 # Submit list name changes with validation
 post '/lists/:id/edit' do
+  @list_id = params[:id].to_i
   list_name = params[:list_name].strip || ''
   name_status = valid_list?(list_name)
   if name_status[:valid]
-    session[:lists][params[:id]][:name] = list_name
+    session[:lists][@list_id][:name] = list_name
     session[:success] = MESSAGES[:list_edit_success]
     redirect '/lists'
   else
