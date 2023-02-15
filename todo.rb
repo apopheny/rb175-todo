@@ -85,7 +85,7 @@ post '/lists/:id/edit' do
   if name_status[:valid]
     session[:lists][@list_id][:name] = list_name
     session[:success] = MESSAGES[:list_edit_success]
-    redirect '/lists'
+    redirect '/lists/:id'
   else
     session[:error] = name_status[:error]
     erb :list_edit, layout: :layout
