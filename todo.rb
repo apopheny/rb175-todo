@@ -14,6 +14,26 @@ before do
   session[:lists] ||= []
 end
 
+helpers do
+  # Validates list name length and uniqueness
+  def valid_list?(name)
+    unless (1..100).cover?(name.size)
+      return { valid: false,
+               error: MESSAGES[:list_length_error] }
+    end
+    return { valid: false, error: MESSAGES[:list_duplicate_name] }\
+      if session[:lists].any? { |list| list[:name] == name }
+    { valid: true }
+  end
+end
+
+# Hash of potential flash messages
+MESSAGES = {
+  new_list_success: 'The list has been created.',
+  list_length_error: 'List name must be between 1-100 characters.',
+  list_duplicate_name: 'List name already exists. Please choose a unique name.'
+}.freeze
+
 get '/' do
   redirect '/lists'
 end
@@ -27,21 +47,6 @@ end
 # Renders the new list form
 get '/lists/new' do
   erb :new_list, layout: :layout
-end
-
-# Hash of potential flash messages
-MESSAGES = {
-  new_list_success: 'The list has been created.',
-  list_length_error:  'List name must be between 1-100 characters.',
-  list_duplicate_name: 'List name already exists. Please choose a unique name.'
-}.freeze
-
-# Validates list name length and uniqueness
-def valid_list?(name)
-  return {valid: false, error: MESSAGES[:list_length_error]} unless (1..100).cover?(name.size)  
-  return {valid: false, error: MESSAGES[:list_duplicate_name]}\
-    if (session[:lists].any? { |list| list[:name] == name })
-  {valid: true}
 end
 
 # Creates a new list
